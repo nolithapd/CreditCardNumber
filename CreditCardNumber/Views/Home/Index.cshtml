@@ -1,0 +1,45 @@
+﻿@model IEnumerable<CreditCardNumber.Models.CreditCardModel>
+@{
+    ViewData["Title"] = "Home Page";
+}
+@{Layout = "~/Views/Shared/_Layout.cshtml";}
+<div class="text-center">
+    <h1 class="display-5">Welcome to the Credit card application</h1>
+
+
+    @using (Html.BeginForm())
+    {
+    <p>Enter Credit Card Number:  @Html.TextBox("creditCardNumber")</p> 
+
+     <input type="submit" name="submit" />
+
+        <div>
+            <h3><strong>@TempData["Message"]</strong></h3>
+        </div>
+    }
+    <table class="table">
+        <tr>
+            <th>
+               Credit Card Number
+            </th>
+            <th>
+                Credit Card Type
+            </th>
+
+            <th></th>
+        </tr>
+        @foreach (var item in Model)
+        {
+
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CreditCardNumber)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CardType)
+                </td>
+
+
+            </tr>
+        }
+</div>
