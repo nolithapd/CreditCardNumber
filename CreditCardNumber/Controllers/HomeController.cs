@@ -48,20 +48,11 @@ namespace CreditCardNumber.Controllers
             else
             {
                 var creditCardDetails = new CreditCardModel();
-             
-                if (IsValidCreditCard(creditCardNumber))
-                {
-                    creditCardDetails.CardType = GetCreditCardType(creditCardNumber);
-                }
-                else
-                {
-                    TempData["Message"] = "Invalid card number!!!";
-                    ModelState.Clear();
-                }
-               
+                      
+                creditCardDetails.CardType = IsValidCreditCard(creditCardNumber);
+                               
                 if (creditCardDetails.CardType != CardType.Unknown && !string.IsNullOrEmpty(creditCardNumber))
                 {
-
 
                     var filename = System.IO.File.ReadAllText(@"./Models/CreditCard.json");
 
@@ -82,7 +73,6 @@ namespace CreditCardNumber.Controllers
                     }
                     else
                     {
-
                         TempData["Message"] = "Credit card already exists!!!";
                         ModelState.Clear();
                     }
@@ -90,7 +80,6 @@ namespace CreditCardNumber.Controllers
                 }
                 else
                 {
-
                     TempData["Message"] = "Invalid card number";
                     ModelState.Clear(); ;
                 }
@@ -99,48 +88,42 @@ namespace CreditCardNumber.Controllers
             return View(creditCardModel);
         }
 
-        public bool IsValidCreditCard(string num)
+        public CardType IsValidCreditCard(string num)
         {
             if (num.All(Char.IsDigit))
             {
-                return true;
+                Regex regAmex = new Regex("^3[47][0-9]{13}$");
+                Regex regMastercard = new Regex("^(5[1-5][0-9]{14}|2(22[1-9][0-9]{12}|2[3-9][0-9]{13}|[3-6][0-9]{14}|7[0-1][0-9]{13}|720[0-9]{12}))$");
+                Regex regVisa = new Regex("^4[0-9]{12}(?:[0-9]{3})?$");
+                Regex regDiscover = new Regex("^65[4-9][0-9]{13}|64[4-9][0-9]{13}|6011[0-9]{12}|(622(?:12[6-9]|1[3-9][0-9]|[2-8][0-9][0-9]|9[01][0-9]|92[0-5])[0-9]{10})$");
+
+                if (regAmex.IsMatch(num))
+                {
+                    return CardType.Amex;
+                }
+                else
+                    if (regMastercard.IsMatch(num))
+                {
+                    return CardType.MasterCard;
+                }
+                else
+                    if (regVisa.IsMatch(num))
+                {
+                    return CardType.VISA;
+                }
+                else
+                    if (regDiscover.IsMatch(num))
+                {
+                    return CardType.Discover;
+                }
+                else
+                {
+                    return CardType.Unknown;
+                }
             }
-            return false;
+            return CardType.Unknown;
         }
 
-        public CardType GetCreditCardType(string num)
-        {
-            Regex regAmex = new Regex("^3[47][0-9]{13}$");
-            Regex regMastercard = new Regex("^(5[1-5][0-9]{14}|2(22[1-9][0-9]{12}|2[3-9][0-9]{13}|[3-6][0-9]{14}|7[0-1][0-9]{13}|720[0-9]{12}))$");
-            Regex regVisa = new Regex("^4[0-9]{12}(?:[0-9]{3})?$");
-            Regex regDiscover = new Regex("^65[4-9][0-9]{13}|64[4-9][0-9]{13}|6011[0-9]{12}|(622(?:12[6-9]|1[3-9][0-9]|[2-8][0-9][0-9]|9[01][0-9]|92[0-5])[0-9]{10})$");
-
-            if (regAmex.IsMatch(num))
-            {
-                return CardType.Amex;
-            }
-            else
-                if (regMastercard.IsMatch(num))
-            {
-                return CardType.MasterCard;
-            }
-            else
-                if (regVisa.IsMatch(num))
-            {
-                return CardType.VISA;
-            }
-            else
-                if (regDiscover.IsMatch(num))
-            {
-                return CardType.Discover;
-            }
-            else
-            {
-                return CardType.Unknown;
-            }
-
-
-        }
         public enum CardType
         {
             [Description("Uknown")]
